@@ -1,4 +1,5 @@
 var recluster = require('recluster'),
+	npid = require('npid',
 	path = require('path'),
 	_ = require('underscore');
 
@@ -24,6 +25,9 @@ function loadConfig() {
 	
 	return config;
 }
+
+var pid = npid.create('./cluster_main.pid');
+pid.removeOnExit();
 
 var config = loadConfig();
 

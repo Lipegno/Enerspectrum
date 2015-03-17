@@ -4,3 +4,8 @@ if [ $(id -u) != 0 ]; then
    sudo "$0" "$@"
    exit
 fi
+
+source ./update_enlistment.sh
+pushd /var/app/
+kill -SIGHUP $(cat cluster_main.pid)
+popd

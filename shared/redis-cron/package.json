@@ -1,0 +1,14 @@
+{
+  "name": "redis-cron",
+  "version": "0.0.1",
+  "description": "Scheduled tasks based on keys expiring in redis",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jon Sheller",
+  "dependencies": {
+    "redis": "^0.12.1"
+  }
+}
