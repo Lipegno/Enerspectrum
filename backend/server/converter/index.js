@@ -7,7 +7,8 @@ exports.string = require('./string.js');
 
 function getType(data) {
 	var possibilities = [];
-	for (var conv in exports) {
+	for (var name in exports) {
+		var conv = exports[name];
 		if (conv.getProbability  && conv.weight) {
 			possibilities.push(
 				{
@@ -17,8 +18,9 @@ function getType(data) {
 		}
 	}
 	
-	_.sortBy(possibilities, 'weightedProbability');
+	possibilities = _.sortBy(possibilities, 'weightedProbability');
 	var bestLikelihood = possibilities[possibilities.length - 1];
+	
 	if (bestLikelihood.weightedProbability > 0) {
 		return bestLikelihood.converter;
 	}

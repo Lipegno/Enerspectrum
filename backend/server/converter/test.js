@@ -1,6 +1,7 @@
 var should = require('should'),
 	converter = require('./index.js'),
-	moment = require('moment');
+	moment = require('moment'),
+	_ = require('underscore');
 
 describe('integer', function() {
 	describe('#getProbability', function() {
@@ -367,4 +368,78 @@ describe('string', function() {
 });
 
 describe('converter', function() {
+	describe('#getType', function() {
+		it('should parse integers', function(done) {
+			var type = converter.getType('22');
+			type.name.should.equal(converter.integer.name);
+			
+			type = converter.getType('22,010,223');
+			type.name.should.equal(converter.integer.name);
+			
+			type = converter.getType('25.122.322');
+			type.name.should.equal(converter.integer.name);
+			
+			type = converter.getType('-1');
+			type.name.should.equal(converter.integer.name);
+			done();
+		});
+		
+		it('should parse floats', function(done) {
+			var type = converter.getType('12.0');
+			type.name.should.equal(converter.floatingPoint.name);
+			
+			type = converter.getType('12.3');
+			type.name.should.equal(converter.floatingPoint.name);
+			
+			type = converter.getType('-1,2');
+			type.name.should.equal(converter.floatingPoint.name);
+			
+			type = converter.getType('3.222,3');
+			type.name.should.equal(converter.floatingPoint.name);
+			
+			type = converter.getType('1,666.03');
+			type.name.should.equal(converter.floatingPoint.name);	
+			done();
+		});
+		
+		it('should parse dates and times', function(done) {
+			var type = converter.getType('1986-02-08');
+			type.name.should.equal(converter.datetime.name);
+			
+			type = converter.getType('08/02/1986');
+			type.name.should.equal(converter.datetime.name);
+			
+			type = converter.getType('08/02/1986 11:59');
+			type.name.should.equal(converter.datetime.name);
+			
+			type = converter.getType('23:53:33');
+			type.name.should.equal(converter.datetime.name);
+			done();
+		});
+		
+		it('should parse strings', function(done) {
+			var type = converter.getType('me gustas cuando callas');
+			type.name.should.equal(converter.string.name);
+			
+			type = converter.getType('português');
+			type.name.should.equal(converter.string.name);
+			
+			type = converter.getType('1!');
+			type.name.should.equal(converter.string.name);
+			done();
+		});
+		
+		it('should handle real-world data', function(done) {
+			var data = ['07-04-2015 14:15:00', '105,861', '72,271', '17,93', '8,181', '3,33', '2,888'];
+			var types = _.map(data, converter.getType);
+			types[0].name.should.equal(converter.datetime.name);
+			types[1].name.should.equal(converter.floatingPoint.name);
+			types[2].name.should.equal(converter.floatingPoint.name);
+			types[3].name.should.equal(converter.floatingPoint.name);
+			types[4].name.should.equal(converter.floatingPoint.name);
+			types[5].name.should.equal(converter.floatingPoint.name);
+			types[6].name.should.equal(converter.floatingPoint.name);
+			done();
+		});
+	});
 });

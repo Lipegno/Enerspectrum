@@ -78,13 +78,25 @@ integer.getProbability = function(data) {
 	
 	if (data.indexOf('.') != -1) {
 		var splitData = data.split('.');
+		if (splitData.length > 2) {
+			var maxProb = 1.0;
+		} else {
+			var maxProb = 0.85;
+		}
+		
 		if (_.every(splitData.slice(1), function(i) { return i.length == 3; })) {
-			return Math.max(checkForFloatingPoint(data.replace(/\./g, '')), 0.0);
+			return Math.min(Math.max(checkForFloatingPoint(data.replace(/\./g, '')), 0.0), maxProb);
 		}
 	} else if (data.indexOf(',') != -1) {
 		var splitData = data.split(',');
+		if (splitData.length > 2) {
+			var maxProb = 1.0;
+		} else {
+			var maxProb = 0.85;
+		}
+		
 		if (_.every(splitData.slice(1), function(i) { return i.length == 3; })) {
-			return Math.max(checkForFloatingPoint(data.replace(/,/g, '')), 0.0);
+			return Math.min(Math.max(checkForFloatingPoint(data.replace(/,/g, '')), 0.0), maxProb);
 		}
 	}
 	

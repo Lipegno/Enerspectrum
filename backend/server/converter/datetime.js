@@ -16,6 +16,10 @@ function datetime(params) {
 
 function combineDateTime(dates, times, separators) {
 	var formats = [];
+	for (var i = 0; i < times.length; i++) {
+		formats.push(times[i]);
+	}
+	
 	for (var i = 0; i < dates.length; i++) {
 		formats.push(dates[i]);
 		for (var j = 0; j < times.length; j++) {
@@ -55,16 +59,14 @@ var formats = combineDateTime(dateFormats, timeFormats, ['T', ' ']);
 datetime.getProbability = function(data) {
 	// We'll just try several different formats.
 	// If one works, return 1.0. If none do, return 0.0.
-	for (var i = 0; i < formats.length; i++) {
-		if (moment(data, formats[i]).isValid()) {
-			return 1.0;
-		}
+	if (moment(data, formats, true).isValid()) {
+		return 1.0;
 	}
 	
 	return 0.0;
 }
 
 datetime.name = "datetime";
-datetime.weight = 1.0;
+datetime.weight = 0.8;
 
 module.exports = datetime;
