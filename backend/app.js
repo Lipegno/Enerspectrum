@@ -1,5 +1,5 @@
 var recluster = require('recluster'),
-	npid = require('npid',
+	npid = require('npid'),
 	path = require('path'),
 	_ = require('underscore');
 

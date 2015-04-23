@@ -31,13 +31,14 @@ describe('webpage', function() {
 	});
 		
 	describe('#run', function() {
+		var runCompleted = false;
 		before(function(done) {
 			nock('http://example.com').get('/')
 				.reply(200, '<!DOCTYPE html><html><head></head><body><p id="idone">TEST TEXT</p></body></html');
 				done();
 				
-				sinon.stub(taskqueue, 'schedule', function(interval, f) {
-					setTimeout(f, 10);
+				sinon.stub(taskqueue, 'schedule', function(interval, id, f) {
+					setTimeout(function(){f(function(){runCompleted = true;});}, 10);
 				});
 		});
 		
@@ -57,6 +58,9 @@ describe('webpage', function() {
 			
 			wp.on('dataReceived', function(data) {
 				data.should.equal('TEST TEXT');
+				setTimeout(function() {
+					runCompleted.should.equal(true);
+				}, 250);
 				done();
 			});
 		});

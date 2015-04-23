@@ -17,7 +17,7 @@ function WebpageFetcher(name, params) {
 		}
 		
 		var capturedThis = this;
-		taskqueue.schedule(params.frequency, function() { capturedThis.run(); });
+		taskqueue.schedule(params.frequency, this.name, function(done) { capturedThis.run(done); });
 	} else {
 		return new WebpageFetcher(name, params);
 	}
@@ -25,7 +25,7 @@ function WebpageFetcher(name, params) {
 
 util.inherits(WebpageFetcher, EventEmitter);
 
-WebpageFetcher.prototype.run = function() {
+WebpageFetcher.prototype.run = function(done) {
 	var options = {url: this.url};
 	if (this.auth) {
 		options.auth = this.auth;
@@ -40,14 +40,18 @@ WebpageFetcher.prototype.run = function() {
 		if (err) {
 			console.log("Error %s fetching page %s", name, url);
 			outerThis.emit("fetchError");
+		} else {
+			if (response.statusCode == 200) {
+				var $ = cheerio.load(html);
+				outerThis.emit("dataReceived", $(selector).text());
+			} else {
+				console.log("Error %s got %s status code for page %s", name, response.statusCode.toString(), url);
+				outerThis.emit("fetchError", {statusCode: response.statusCode});
+			}
 		}
 		
-		if (response.statusCode == 200) {
-			var $ = cheerio.load(html);
-			outerThis.emit("dataReceived", $(selector).text());
-		} else {
-			console.log("Error %s got %s status code for page %s", name, response.statusCode.toString(), url);
-			outerThis.emit("fetchError", {statusCode: response.statusCode});
+		if (done) {
+			done();
 		}
 	});
 };
