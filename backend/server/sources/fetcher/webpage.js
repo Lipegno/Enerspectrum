@@ -16,8 +16,13 @@ function WebpageFetcher(name, params) {
 			};
 		}
 		
+		var frequency = {
+			'minutesOffset': params.minutesOffset,
+			'minutesInterval': params.minutesInterval
+		};
+		
 		var capturedThis = this;
-		taskqueue.schedule(params.frequency, this.name, function(done) { capturedThis.run(done); });
+		taskqueue.schedule(frequency, this.name, function(done) { capturedThis.run(done); });
 	} else {
 		return new WebpageFetcher(name, params);
 	}
@@ -43,7 +48,13 @@ WebpageFetcher.prototype.run = function(done) {
 		} else {
 			if (response.statusCode == 200) {
 				var $ = cheerio.load(html);
-				outerThis.emit("dataReceived", $(selector).text());
+				var elementText = $(selector).map(function() { return $(this).text(); });
+				var elementTextArray = [];
+				for (var i = 0; i < elementText.length; i++) {
+					elementTextArray.push(elementText[i]);
+				}
+				
+				outerThis.emit("dataReceived", elementTextArray);
 			} else {
 				console.log("Error %s got %s status code for page %s", name, response.statusCode.toString(), url);
 				outerThis.emit("fetchError", {statusCode: response.statusCode});

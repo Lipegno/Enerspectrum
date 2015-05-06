@@ -4,7 +4,8 @@ var express = require('express'),
 	models = require('../models'),
 	converter = require('./converter'),
 	webScraper = require('./webScraper.js'),
-	jsonListener = require('./jsonListener.js');
+	jsonListener = require('./jsonListener.js'),
+	storage = require('./storage');
 
 var router = express.Router();
 
@@ -22,7 +23,7 @@ function create(name, config, callback) {
 	}
 	
 	var sourceType = schemas[name];
-	sourceType.create(config, callback);
+	sourceType.create(storage.MongoStorage, config, callback);
 }
 
 function validateConfig(schema, config) {
@@ -106,6 +107,8 @@ router.get('/source/:source_id/sample', function(req, res) {
 
 router.get('/source/:source_id/producer/:producer_id/sample', function(req, res) {
 });
+
+router.use(jsonListener.router);
 
 function prepareSource(sourceData, callback) {
 	create(sourceData.type, sourceData.config, callback);

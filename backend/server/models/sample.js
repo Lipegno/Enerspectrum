@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 var sampleSchema = Schema({
 	timestamp: Date,
 	source: Schema.ObjectId,
+	producer: Schema.ObjectId,
 	data: {}
 });
 

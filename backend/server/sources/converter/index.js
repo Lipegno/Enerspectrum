@@ -1,9 +1,16 @@
 var _ = require('underscore');
 
+function identityConverter() {
+	return function(v) {
+		return v;
+	};
+}
+
 exports.datetime = require('./datetime.js');
 exports.integer = require('./integer.js');
 exports.floatingPoint = require('./floatingPoint.js');
 exports.string = require('./string.js');
+exports.object = identityConverter;
 
 function getType(data) {
 	var possibilities = [];
