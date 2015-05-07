@@ -1,10 +1,10 @@
 {
 	"server": {
-		"workerCount": 4,
+		"workerCount": 3,
 		"workerArgs": [3000]
 	},
 	"web": {
-		"workerCount": 2,
+		"workerCount": 1,
 		"workerArgs": [3001]
 	}
 }

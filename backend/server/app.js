@@ -11,10 +11,6 @@ mongoose.connect('localhost', 'testdb');
 sources.prepareSources();
 app.use('/api', sources.router);
 
-app.get('/', function(req, res) {
-	res.send(app._router.stack);
-});
-
 // TODO: make this listen to the port requested by the parent
 var server = app.listen(3000, function() {
 	var host = server.address().address;

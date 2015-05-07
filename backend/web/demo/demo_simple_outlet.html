@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="/public/query.js"></script>
+	</head>
+	<body>
+		<script>
+			var svg = d3.select('body').append('svg').attr('width', 400).attr('height', 400);
+			var g = svg.append('g');
+			var base_plate = g.append('rect').attr('rx', 8).attr('ry', 8).attr('width', 360).attr('height', 400).attr('stroke', '#333').attr('fill', '#fff');
+			var socket_plate = g.append('rect').attr('width', 300).attr('height', 300).attr('x', (360 - 300) / 2).attr('y', 400 - 300 - 30).attr('stroke', '#444').attr('fill', '#fff');
+			var socket = g.append('circle').attr('r', 120).attr('cx', 180).attr('cy', 220).attr('stroke', '#222').attr('stroke-width', 2).attr('fill', '#fff');
+			
+			var light = g.append('circle').attr('r', 10).attr('cx', 180).attr('cy', 20).attr('stroke', '#111').attr('stroke-width', 2);
+			var blinkInterval = -1;
+			
+			function connected() {
+			}
+			
+			function disconnected() {
+			}
+			
+			function tryConnect() {
+				startBlinkMode();
+			}
+			
+			function startBlinkMode() {
+				var lightOn = false;
+				blinkInterval = setInterval(function() {
+					lightOn = !lightOn;
+					light.attr('fill', lightOn ? '#88f' : '#000');
+				}, 700);
+			}
+			
+			function stopBlinkMode() {
+				if (blinkInterval != -1) {
+					clearInterval(blinkInterval);
+					blinkInterval = -1;
+					light.attr('fill', '#000');
+				}
+			}
+			
+			tryConnect();
+		</script>
+	</body>
+</html>
