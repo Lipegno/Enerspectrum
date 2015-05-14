@@ -1,4 +1,5 @@
 var express = require('express');
+var _ = require('underscore');
 var sampleConverter = require('./sampleConverter.js');
 var router = express.Router();
 
@@ -25,11 +26,29 @@ function jsonListener(storage, config) {
 	var self = this;
 	
 	router.post('/json/' + config.slug, function(req, res) {
-		console.log(req.body);
-		var convertedData = self.converter.convert(req.body);
-		console.log(convertedData);
-		storage.writeSample(self.id, null, convertedData);
-		res.send('wut');
+        if (Array.isArray(req.body)) {
+            var data = req.body;
+        } else {
+            var data = [req.body];
+        }
+        
+        var convertedData = _.map(data, function (d) { return self.converter.convert(d); });
+
+        if (convertedData[0].timestamp) {
+            var timestamps = _.map(_.pluck(convertedData, 'timestamp'), function (t) { return t.toDate(); });
+        } else {
+            var now = new Date();
+            var timestamps = _.map(new Array(convertedData.length), function () { return now; });
+        }
+
+        storage.writeSamples(self.name, null, timestamps, convertedData, function (err, result) {
+            if (err) {
+                res.send("Error");
+                return;
+            }
+
+            res.send({ 'rows': result.length });
+        });
 	});
 	
 	console.log('jsonListener listening on ' + '/json/' + config.slug);

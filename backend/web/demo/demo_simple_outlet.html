@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+        <title>Outlet</title>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-		<script src="/public/query.js"></script>
+		<script src="/public/enerspectrum.js"></script>
 	</head>
 	<body>
 		<script>
@@ -11,25 +12,40 @@
 			var base_plate = g.append('rect').attr('rx', 8).attr('ry', 8).attr('width', 360).attr('height', 400).attr('stroke', '#333').attr('fill', '#fff');
 			var socket_plate = g.append('rect').attr('width', 300).attr('height', 300).attr('x', (360 - 300) / 2).attr('y', 400 - 300 - 30).attr('stroke', '#444').attr('fill', '#fff');
 			var socket = g.append('circle').attr('r', 120).attr('cx', 180).attr('cy', 220).attr('stroke', '#222').attr('stroke-width', 2).attr('fill', '#fff');
+
+			g.append('circle').attr('r', 10).attr('cx', 130).attr('cy', 220).attr('fill', 'black');
+			g.append('circle').attr('r', 10).attr('cx', 230).attr('cy', 220).attr('fill', 'black');
 			
-			var light = g.append('circle').attr('r', 10).attr('cx', 180).attr('cy', 20).attr('stroke', '#111').attr('stroke-width', 2);
+			var light = g.append('circle').attr('r', 10).attr('cx', 180).attr('cy', 25).attr('stroke', '#111').attr('stroke-width', 2);
 			var blinkInterval = -1;
+			var dataTimeout = 1000 * 60;
+			var errorTimeout = 1000 * 60;
+			var ramp=d3.scale.linear().domain([0.0,0.2]).range(["red","green"]);
 			
-			function connected() {
+			function dataReceived(err, data) {
+			    if (err || data.length < 1) {
+			        startBlinkMode();
+			        setTimeout(tryFetch, errorTimeout);
+			    } else {
+			        stopBlinkMode();
+			        light.transition().attr('fill', ramp(data[0].percent));
+			        setTimeout(tryFetch, dataTimeout);
+			    }
 			}
 			
-			function disconnected() {
-			}
-			
-			function tryConnect() {
-				startBlinkMode();
+			function tryFetch() {
+			    enerspectrum('madeira-production')
+                    .query()
+                    .latest()
+                    .project("percent = (eolica + foto + hidrica) / total")
+                    .execute(dataReceived);
 			}
 			
 			function startBlinkMode() {
 				var lightOn = false;
 				blinkInterval = setInterval(function() {
 					lightOn = !lightOn;
-					light.attr('fill', lightOn ? '#88f' : '#000');
+					light.transition().attr('fill', lightOn ? '#88f' : '#000');
 				}, 700);
 			}
 			
@@ -41,7 +57,8 @@
 				}
 			}
 			
-			tryConnect();
+			startBlinkMode();
+			tryFetch();
 		</script>
 	</body>
 </html>

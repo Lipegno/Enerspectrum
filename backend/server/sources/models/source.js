@@ -1,5 +1,4 @@
 var mongoose = require('mongoose'),
-	sources = require('../sources'),
 	Schema = mongoose.Schema;
 	
 var sourceSchema = Schema({

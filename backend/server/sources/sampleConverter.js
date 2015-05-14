@@ -16,16 +16,20 @@ function sampleConverter(params) {
 	this.elementConverters = {};
 	
 	for (key in params) {
-		this.elementConverters[key] = createElementConverter(params[key]);
+        this.elementConverters[key] = {
+            'name': params[key].name || key,
+            'converter': createElementConverter(params[key])
+        };
 	}
 }
 
 sampleConverter.prototype.convert = function(sample) {
 	output = {};
-	for (ecName in this.elementConverters) {
-		output[ecName] = this.elementConverters[ecName](sample[ecName]);
-	}
-	
+    for (ecName in this.elementConverters) {
+        var outName = this.elementConverters[ecName]['name'] || ecName;
+		output[outName] = this.elementConverters[ecName]['converter'](sample[ecName]);
+    }
+
 	return output
 };
 

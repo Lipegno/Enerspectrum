@@ -1,12 +1,22 @@
 var express = require('express'),
-	mongoose = require('mongoose'),
-	sources = require('./sources'),
+    sources = require('./sources'),
+    mongoose = require('mongoose'),
 	bodyParser = require('body-parser');
 
 var app = express();
 app.use(bodyParser.json());
 
-mongoose.connect('localhost', 'testdb');
+mongoose.connect('localhost', 'enerspectrumMetadata', function (err) {
+    if (err) {
+        console.log(err);
+    }
+});
+
+sources.connectToStorage("mongodb://localhost:27017/enerspectrumSamples", function (err) {
+    if (err) {
+        console.log(err);
+    }
+});
 
 sources.prepareSources();
 app.use('/api', sources.router);

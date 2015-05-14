@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Electricity usage</title>
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js"></script>
+    <script src="/public/enerspectrum.js"></script>
+</head>
+<body>
+    <div>
+        <table>
+            <thead>
+                <tr><th colspan="3">Parameters</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mean</td>
+                    <td><input type="range" min="1" max="10" data-bind="value: mean"/></td>
+                    <td><span data-bind ="text: mean"></span> kWh</td>
+                </tr>
+                <tr>
+                    <td>SD</td>
+                    <td><input type="range" min="0" max="5" step="0.1" data-bind="value: sd"></td>
+                    <td><span data-bind="text: sd"></span> kWh</td>
+                </tr>
+                <tr>
+                    <td>Posting frequency</td>
+                    <td><input type="range" min="1" max="30" data-bind="value: frequency"/></td>
+                    <td><span data-bind="text: frequency"></span> minutes</td>
+                </tr>
+                <tr>
+                    <td colspan="3" data-bind="text: status"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="graphDiv"></div>
+
+    <script>
+        function ViewModel() {
+            this.samples = [];
+            this.frequency = ko.observable(5);
+            this.mean = ko.observable(3);
+            this.sd = ko.observable(1);
+            this.status = ko.observable("Waiting...");
+
+            this.generateSample = function () {
+                this.samples.push({'timestamp': new Date(), 'power': Math.random() * this.sd() + this.mean()});
+            };
+
+            this.sendSamples = function () {
+                enerspectrum('household-usage')
+                    .post(this.samples)
+                    .execute(function (err, result) {
+                        if (err) {
+                            this.status(err);
+                            return;
+                        }
+
+                        this.status(result);
+                        return;
+                    }.bind(this));
+            };
+
+            setInterval(function () {
+                this.generateSample();
+                if (this.samples.length > this.frequency()) {
+                    this.sendSamples();
+                }
+
+            }.bind(this), 1000 * 60);
+        }
+
+        var vm = new ViewModel();
+        ko.applyBindings(vm);
+    </script>
+
+</body>
+</html>
