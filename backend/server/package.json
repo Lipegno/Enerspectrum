@@ -9,6 +9,7 @@
     "cheerio": "^0.18.0",
     "express": "^4.12.3",
     "moment": "^2.9.0",
+    "mongodb": "^2.0.31",
     "mongoose": "^3.8.25",
     "node-uuid": "^1.4.3",
     "redis": "^0.12.1",

@@ -1,4 +1,5 @@
 var webpageFetcher = require('./fetcher').webpage;
+var moment = require('moment');
 var sampleConverter = require('./sampleConverter.js');
 
 function webScraper(storage, config) {
@@ -14,8 +15,16 @@ function webScraper(storage, config) {
 		console.log(data);
 		console.log(this);
 		var convertedData = this.converter.convert(data);
-		console.log(convertedData);
-		storage.writeSample(this.id, null, convertedData);
+        console.log(convertedData);
+        if (convertedData.timestamp) {
+            var timestamp = convertedData.timestamp;
+        } else {
+            var timestamp = moment();
+        }
+        
+        timestamp = timestamp.toDate();
+
+		storage.writeSample(this.name, null, timestamp, convertedData);
 	}.bind(this));
 }
 

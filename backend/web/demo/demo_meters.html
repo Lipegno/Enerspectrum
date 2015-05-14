@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>Meters</title>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="/public/enerspectrum.js"></script>
+        <style>
+            .meter {
+              fill: url(#meterGrad);
+              stroke-width: 05px;
+            }
+        </style>
+	</head>
+	<body>
+		<script>
+            var svg = d3.select('body').append('svg').attr('width', 700).attr('height', 400);
+            svg.append("linearGradient")
+                .attr('id', 'meterGrad')
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", 0)
+                .attr("x2", 0).attr("y2", 400)
+                .selectAll("stop")
+                .data([
+                    { offset: "0%", color: "red" },
+                    { offset: "50%", color: "gray" },
+                    { offset: "100%", color: "green" }
+                  ])
+                .enter().append("stop")
+                .attr("offset", function (d) { return d.offset; })
+                .attr("stop-color", function (d) { return d.color; });
+
+			var g = svg.append('g');
+			var powerTypes = ['Wind', 'Solar', 'Hydro', 'Thermal', 'Bio'];
+			var meters_gs = g
+                .selectAll('g')
+                .data(powerTypes)
+                .enter()
+                .append('g')
+                .attr('transform', function (d, i) { return 'translate(' + (i * 110 + 10) + ',10)'; });
+
+			meters_gs
+                .append('rect')
+                .attr('width', 100)
+                .attr('height', 380)
+                .attr('fill', 'black')
+                .attr('stroke', 'black');
+
+			var meters = meters_gs.append('rect')
+                                  .attr('width', 100)
+                                  .attr('height', 0)
+                                  .attr('class', 'meter');
+
+			meters_gs
+                .append('text')
+                .text(function (d) { return d; })
+                .attr('fill', 'white')
+                .attr("font-family", "sans-serif")
+			    .attr("font-size", "20px")
+                .attr('x', 50)
+                .attr('y', 300)
+                .attr('text-anchor', 'middle');
+            
+			function dataReceived(err, data) {
+			    if (err || data.length != 1) {
+			        console.log(err);
+			    } else {
+			        data = data[0];
+			        var arrayData = [data.wind, data.solar, data.hydro, data.thermal, data.bio];
+			        meters.data(arrayData)
+                          .transition()
+                          .attr('height', function (d) { return d * 400; });
+			    }
+
+			    setTimeout(requestData, 1000 * 60);
+			}
+
+            
+			function requestData() {
+			    enerspectrum('madeira-production')
+                    .query()
+                    .latest()
+                    .project('wind = eolica / total',
+                             'solar = foto / total',
+                             'hydro = hidrica / total',
+                             'thermal = termica / total',
+                             'bio = biomassa / total')
+                    .execute(dataReceived);
+			}
+
+			requestData();
+		</script>
+	</body>
+</html>

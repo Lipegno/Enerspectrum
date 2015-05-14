@@ -11,6 +11,7 @@
     "express": "^4.12.2",
     "npid": "^0.4.0",
     "recluster": "^0.4.0",
+    "request": "^2.55.0",
     "underscore": "^1.8.2"
   }
 }

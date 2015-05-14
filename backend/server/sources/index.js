@@ -1,11 +1,12 @@
 var express = require('express'),
-	_ = require('underscore'),
-	async = require('async'),
-	models = require('../models'),
-	converter = require('./converter'),
+    _ = require('underscore'),
+    async = require('async'),
+    models = require('./models'),
+    query = require('./query'),
+    converter = require('./converter'),
+    storage = require('./storage'),
 	webScraper = require('./webScraper.js'),
-	jsonListener = require('./jsonListener.js'),
-	storage = require('./storage');
+	jsonListener = require('./jsonListener.js');
 
 var router = express.Router();
 
@@ -23,7 +24,7 @@ function create(name, config, callback) {
 	}
 	
 	var sourceType = schemas[name];
-	sourceType.create(storage.MongoStorage, config, callback);
+	sourceType.create(storage, config, callback);
 }
 
 function validateConfig(schema, config) {
@@ -95,8 +96,48 @@ router.get('/source', function(req, res) {
 	
 });
 
-router.get('/source/:source_id', function(req, res) {
-	
+router.get('/source/:source_name', function (req, res) {
+    var q = JSON.parse(req.query.q);
+    if (!q) {
+        q = [
+            { '$sort': ['-timestamp'] },
+            { '$limit': 250 }
+        ];
+    }
+    
+    var source_name = req.params.source_name;
+    
+    if (!source_name) {
+        res.status(404).send('source not found');
+        return;
+    }
+    
+    function sourcesReady(err) {
+        if (err) {
+            res.status(500).send('error finding source');
+            return;
+        }
+
+        if (!(source_name in sources)) {
+            res.status(404).send('source not found');
+            return;
+        }
+
+        query.execute(null, sources[source_name], q, function (err, result) {
+            if (err) {
+                res.status(500).send('error querying source');
+                return;
+            }
+            
+            res.json(result);
+        });
+    }
+
+    if (!(source_name in sources)) {
+        refreshSources(sourcesReady);
+    } else {
+        sourcesReady();
+    }
 });
 
 router.get('/source/:source_id/producer/:producer_id', function(req, res) {
@@ -111,7 +152,15 @@ router.get('/source/:source_id/producer/:producer_id/sample', function(req, res)
 router.use(jsonListener.router);
 
 function prepareSource(sourceData, callback) {
-	create(sourceData.type, sourceData.config, callback);
+    create(sourceData.type, sourceData.config, function (err, response) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        sources[sourceData.config.name] = response;
+        callback(null, response);
+    });
 }
 
 function saveSource(source, callback) {
@@ -136,9 +185,26 @@ function prepareSources(callback) {
 			return;
 		}
 		
-		async.map(sources, prepareSource, callback);
+        async.map(sources, prepareSource, callback);
 	});
 };
 
+function refreshSources(callback) {
+    models.Source.find({}, function (error, sourceList) {
+        if (error) {
+            callback(error);
+            return;
+        }
+        
+        sourceList = _.filter(sourceList, function (x) { return !(x.name in sources); });
+        async.map(sourceList, prepareSource, callback);
+    });
+}
+
+function connectToStorage(connectionString, callback) {
+    storage.connect(connectionString, callback);
+}
+
 exports.prepareSources = prepareSources;
 exports.router = router;
+exports.connectToStorage = connectToStorage;
