@@ -20,7 +20,7 @@
 			var blinkInterval = -1;
 			var dataTimeout = 1000 * 60;
 			var errorTimeout = 1000 * 60;
-			var ramp=d3.scale.linear().domain([0.0,0.2]).range(["red","green"]);
+			var ramp=d3.scale.linear().domain([0.0,0.15]).range(["red","green"]);
 			
 			function dataReceived(err, data) {
 			    if (err || data.length < 1) {

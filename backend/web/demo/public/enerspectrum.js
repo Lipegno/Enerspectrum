@@ -128,6 +128,10 @@
     function getTable(tableName) {
         return new table(tableName);
     }
+    
+    getTable.setDevice = function (deviceId, authToken) {
+
+    };
 
     return getTable;
 })();

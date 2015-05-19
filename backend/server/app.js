@@ -1,10 +1,24 @@
 var express = require('express'),
     sources = require('./sources'),
     mongoose = require('mongoose'),
+    passport = require('passport'),
+    session = require('express-session'),
+    RedisStore = require('connect-redis')(session),
+    auth = require('./auth'),
 	bodyParser = require('body-parser');
 
 var app = express();
 app.use(bodyParser.json());
+app.use(session({
+    secret: "8675309", 
+    store : new RedisStore(),
+    cookie : {
+        maxAge : 604800 // one week
+    }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('localhost', 'enerspectrumMetadata', function (err) {
     if (err) {
@@ -20,6 +34,7 @@ sources.connectToStorage("mongodb://localhost:27017/enerspectrumSamples", functi
 
 sources.prepareSources();
 app.use('/api', sources.router);
+app.use('/auth', auth.router);
 
 // TODO: make this listen to the port requested by the parent
 var server = app.listen(3000, function() {
