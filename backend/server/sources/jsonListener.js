@@ -25,31 +25,36 @@ function jsonListener(storage, config) {
 	
 	var self = this;
 	
-	router.post('/json/' + config.slug, function(req, res) {
-        if (Array.isArray(req.body)) {
-            var data = req.body;
-        } else {
-            var data = [req.body];
-        }
+    router.post('/json/' + config.slug,
+        (this.config.producerRequired) ? passport.authenticate('device', {session: false}) : function (req, res, next) { return next(); },
+        function (req, res) {
+            if (Array.isArray(req.body)) {
+                var data = req.body;
+            } else {
+                var data = [req.body];
+            }
         
-        var convertedData = _.map(data, function (d) { return self.converter.convert(d); });
+            var convertedData = _.map(data, function (d) { return self.converter.convert(d); });
 
-        if (convertedData[0].timestamp) {
-            var timestamps = _.map(_.pluck(convertedData, 'timestamp'), function (t) { return t.toDate(); });
-        } else {
-            var now = new Date();
-            var timestamps = _.map(new Array(convertedData.length), function () { return now; });
-        }
-
-        storage.writeSamples(self.name, null, timestamps, convertedData, function (err, result) {
-            if (err) {
-                res.send("Error");
-                return;
+            if (convertedData[0].timestamp) {
+                var timestamps = _.map(_.pluck(convertedData, 'timestamp'), function (t) { return t.toDate(); });
+            } else {
+                var now = new Date();
+                var timestamps = _.map(new Array(convertedData.length), function () { return now; });
             }
 
-            res.send({ 'rows': result.length });
-        });
-	});
+        storage.writeSamples(self.name, req.user ? req.user.producer.id : null, timestamps, convertedData,
+                function (err, result) {
+                    if (err) {
+                        res.send("Error");
+                        return;
+                    }
+            
+                    console.log(result);    
+
+                    res.send({ 'rows': result.length });
+                });
+	    });
 	
 	console.log('jsonListener listening on ' + '/json/' + config.slug);
 }

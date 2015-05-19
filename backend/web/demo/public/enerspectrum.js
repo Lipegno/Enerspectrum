@@ -1,4 +1,6 @@
 ﻿window.enerspectrum = (function () {
+    var privateData = {};
+
     function _query(tableName) {
         this.table = tableName;
         this.pipeline = [];
@@ -81,11 +83,23 @@
         return this;
     };
     
-    _query.prototype.execute = function (callback) {
-        var pipeline = encodeURIComponent(JSON.stringify(this.pipeline));
-        var request = new XMLHttpRequest();
-        request.open('GET', '/api/source/' + encodeURIComponent(this.table) + '?q=' + pipeline, true);
+    // This can be called with or without username and password
+    function sendRequest(method, url, payload, username, password, callback) {
+        if (!callback && !password) {
+            callback = username;
+            username = null;
+        }
         
+        payload = JSON.stringify(payload);
+        var request = new XMLHttpRequest();
+
+        if (method == 'GET') {
+            request.open('GET', url + '?q=' + encodeURIComponent(payload), true, username, password);
+        } else if (method == 'POST') {
+            request.open('POST', url, true, username, password);
+            request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+        }
+
         request.onload = function () {
             if (request.status >= 200 && request.status < 400) {
                 // Success!
@@ -100,8 +114,17 @@
         request.onerror = function () {
             callback(new Error('Cannot reach server'));
         };
-        
-        request.send();
+
+        if (method == 'POST') {
+            request.send(payload);
+        } else {
+            request.send();
+        }
+    }
+    
+    _query.prototype.execute = function (callback) {
+        sendRequest('GET', '/api/source/' + encodeURIComponent(this.table),
+            this.pipeline, privateData.username, privateData.password, callback);
     };
     
     function _post(tableName, samples) {
@@ -110,7 +133,8 @@
     }
     
     _post.prototype.execute = function (callback) {
-
+        sendRequest('POST', '/api/json/' + encodeURIComponent(this._table),
+            this._samples, privateData.deviceId, privateData.authToken, callback);
     };
     
     function table(tableName) {
@@ -128,6 +152,16 @@
     function getTable(tableName) {
         return new table(tableName);
     }
+    
+    getTable.setDevice = function (deviceId, authToken) {
+        privateData.deviceId = deviceId;
+        privateData.authToken = authToken;
+    };
+    
+    getTable.loginProducer = function (username, password) {
+        privateData.username = username;
+        privateData.password = password;
+    };
 
     return getTable;
 })();

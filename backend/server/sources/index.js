@@ -1,7 +1,7 @@
 var express = require('express'),
     _ = require('underscore'),
     async = require('async'),
-    models = require('./models'),
+    models = require('../models'),
     query = require('./query'),
     converter = require('./converter'),
     storage = require('./storage'),
