@@ -67,7 +67,7 @@ producerSchema.methods.createDevice = function (name, callback) {
             self.save();
             
             callback(null, {
-                'deviceId': deviceId,
+                'deviceId': self.username + ':' + deviceId,
                 'name': name,
                 'authToken': authToken
             });
