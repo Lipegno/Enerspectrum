@@ -57,6 +57,8 @@
                             return;
                         }
 
+			this.samples = [];
+
                         this.status(result.rows + " samples saved");
                         return;
                     }.bind(this));
@@ -75,8 +77,8 @@
         ko.applyBindings(vm);
 
         // TODO: This is hardcoded to a test device.
-        enerspectrum.setDevice("jon:037f394e8559b64077170a30c0e251fc7b09ba9a9c6f4fd",
-                               "ae8b3541d92f1573dc003378430ee52f23bf621caff75de5");
+        enerspectrum.setDevice("jon-9fa4cdef87beed41fd0cc959fc698ff296d5b2a529ca199",
+                               "1af1eda4b8ebd16524c67d5582dba45fb47bc584932b443c");
     </script>
 
 </body>

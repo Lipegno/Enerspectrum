@@ -30,12 +30,16 @@ producerSchema.methods.authDevice = function (deviceId, authToken, callback) {
     }
 
     if (!device) {
-        callback(new Error("Unrecognized device"));
+        callback(null, false);
     }
 
     bcrypt.compare(authToken, device.authToken, function (err, isMatch) {
         if (err) return callback(err);
-        callback(null, isMatch);
+	
+	if (!isMatch)
+        	callback(null, false);
+	else
+		callback(null, device);
     });
 };
 
@@ -67,7 +71,7 @@ producerSchema.methods.createDevice = function (name, callback) {
             self.save();
             
             callback(null, {
-                'deviceId': self.username + ':' + deviceId,
+                'deviceId': self.username + '-' + deviceId,
                 'name': name,
                 'authToken': authToken
             });

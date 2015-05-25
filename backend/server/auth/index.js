@@ -6,8 +6,7 @@
 
 var DeviceAuth = new BasicStrategy(
     function (username, password, done) {
-        console.log(username, password);
-        var splitUsername = username.split(':');
+        var splitUsername = username.split('-');
         if (splitUsername.length != 2) {
             done(null, false);
             return;
@@ -27,30 +26,20 @@ var DeviceAuth = new BasicStrategy(
                 return;
             }
 
-            for (var i = 0; i < user.devices.length; i++) {
-                if (user.devices[i].id == deviceId) {
-                    var device = user.devices[i];
-                    break;
+            user.authDevice(deviceId, password, function(err, match) {
+                if (err) {
+                    return done(err);
                 }
-            }
 
-            if (!device) {
-                done(null, false);
-                return;
-            }
+                if (match) {
+                   return done(null, {
+                         producer: user,
+                         device: match
+                        });
+                }
 
-            if (device.authtoken != crypto.createHmac('sha1', device.salt).update(password).digest('hex')) {
-                done(null, false);
-                return;
-            }
-
-            var deviceCookie = {
-                device: device,
-                producer: producer
-            };
-
-            done(null, deviceCookie);
-            return;
+                return done(null, false);
+            });
         });
     }
 );
