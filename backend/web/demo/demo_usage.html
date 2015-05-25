@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Electricity usage</title>
     <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.1.0.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="public/enerspectrum.js"></script>
 </head>
 <body>
@@ -79,6 +80,23 @@
         // TODO: This is hardcoded to a test device.
         enerspectrum.setDevice("jon-9fa4cdef87beed41fd0cc959fc698ff296d5b2a529ca199",
                                "1af1eda4b8ebd16524c67d5582dba45fb47bc584932b443c");
+							   
+		function dataReceived(err, data) {
+			if (err) {
+				console.log(err);
+				return;
+			}
+			
+			console.log(data);
+		}
+							
+		setInterval(function() {
+			enerspectrum('household-usage')
+				.query()
+				.sort('-timestamp')
+				.limit(20)
+				.execute(dataReceived);
+		}, 1000 * 60 * 1);
     </script>
 
 </body>
