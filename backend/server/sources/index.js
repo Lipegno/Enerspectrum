@@ -92,10 +92,6 @@ router.post('/source_schema/:schema_name/create', function(req, res) {
 	});
 });
 
-router.get('/source', function(req, res) {
-	
-});
-
 router.get('/source/:source_name', function (req, res) {
     var q = JSON.parse(req.query.q);
     if (!q) {
@@ -140,15 +136,6 @@ router.get('/source/:source_name', function (req, res) {
     }
 });
 
-router.get('/source/:source_id/producer/:producer_id', function(req, res) {
-});
-
-router.get('/source/:source_id/sample', function(req, res) {
-});
-
-router.get('/source/:source_id/producer/:producer_id/sample', function(req, res) {
-});
-
 router.use(jsonListener.router);
 
 function prepareSource(sourceData, callback) {
@@ -173,7 +160,8 @@ function saveSource(source, callback) {
 			return;
 		}
 		
-		source.id = modelSource.id;
+        source.id = modelSource.id;
+        storage.initializeCollection(source.name, !!(source.producerRequired));
 		callback(null, source);
 	});
 }

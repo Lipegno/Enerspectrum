@@ -20,6 +20,11 @@ app.get('/api*', function (req, res) {
 
 app.post('/api*', function (req, res) {
     console.log('Proxying POST to :3000');
+    console.log(req.username);
+    console.log(req.password);
+    console.log(req.originalUrl);
+    console.log(req.body);
+    console.log(req.headers.authentication);
     var url = 'http://localhost:3000' + req.originalUrl;
     request({
         url: url,
