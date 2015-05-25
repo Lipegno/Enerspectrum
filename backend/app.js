@@ -1,5 +1,4 @@
 var recluster = require('recluster'),
-	npid = require('npid'),
 	path = require('path'),
 	_ = require('underscore');
 
@@ -26,21 +25,15 @@ function loadConfig() {
 	return config;
 }
 
-var pid = npid.create('./cluster_main.pid');
-pid.removeOnExit();
-
 var config = loadConfig();
 
 var serverCluster = recluster(path.join(__dirname, 'server/app.js'), {workers: config.server.workerCount, args: config.server.workerArgs});
-var webCluster = recluster(path.join(__dirname, 'web/app.js'), {workers: config.web.workerCount, args: config.web.workerArgs});
 
 process.on('SIGHUP', function() {
     console.log('Got SIGHUP, reloading cluster...');
     serverCluster.reload();
-	webCluster.reload();
 });
 
 console.log("Starting clusters...");
 serverCluster.run();
-webCluster.run();
 console.log("Clusters running.");

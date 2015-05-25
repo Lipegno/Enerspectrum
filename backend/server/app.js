@@ -36,8 +36,8 @@ sources.prepareSources();
 app.use('/api', sources.router);
 app.use('/auth', auth.router);
 
-// TODO: make this listen to the port requested by the parent
-var server = app.listen(3000, function() {
+var port = process.argv[2] || 3000;
+var server = app.listen(port, function() {
 	var host = server.address().address;
 	var port = server.address().port;
 
