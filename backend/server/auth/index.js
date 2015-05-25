@@ -6,6 +6,7 @@
 
 var DeviceAuth = new BasicStrategy(
     function (username, password, done) {
+        console.log(username, password);
         var splitUsername = username.split(':');
         if (splitUsername.length != 2) {
             done(null, false);

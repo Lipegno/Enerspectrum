@@ -1,8 +1,12 @@
-var express = require('express');
-var _ = require('underscore');
-var sampleConverter = require('./sampleConverter.js');
+var express = require('express'),
+    _ = require('underscore'),
+    passport = require('passport'),
+    sampleConverter = require('./sampleConverter.js');
+
 var router = express.Router();
 
+// TODO: Storing this per-process means that there's a race
+// condition in slug creation.
 var slugs = {};
 
 function slugify(str) {
@@ -21,7 +25,8 @@ function jsonListener(storage, config) {
 	this.name = config.name;
 	this.config = config;
 	this.storage = storage;
-	this.converter = new sampleConverter(config.converter);
+    this.converter = new sampleConverter(config.converter);
+    this.producerRequired = config.producerRequired;
 	
 	var self = this;
 	
@@ -43,7 +48,7 @@ function jsonListener(storage, config) {
                 var timestamps = _.map(new Array(convertedData.length), function () { return now; });
             }
 
-        storage.writeSamples(self.name, req.user ? req.user.producer.id : null, timestamps, convertedData,
+        storage.writeSamples(self.name, req.user ? req.user.producer.id : null, req.user ? req.user.device.name : null, timestamps, convertedData,
                 function (err, result) {
                     if (err) {
                         res.send("Error");
@@ -79,6 +84,6 @@ exports.create = create;
 exports.router = router;
 exports.params = {
 	'name': { type: 'string', required: true},
-	'producerRequired': {type: 'integer', required: false},
+	'producerRequired': {type: 'integer', required: false, defaultValue: true},
 	'converter': { type: 'object', required: true}
 };

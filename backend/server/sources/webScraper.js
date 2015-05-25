@@ -24,7 +24,7 @@ function webScraper(storage, config) {
         
         timestamp = timestamp.toDate();
 
-		storage.writeSample(this.name, null, timestamp, convertedData);
+		storage.writeSample(this.name, null, null, timestamp, convertedData);
 	}.bind(this));
 }
 

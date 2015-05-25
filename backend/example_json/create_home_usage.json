@@ -1,0 +1,7 @@
+{
+    "name": "household-usage",
+    "converter": {
+        "timestamp": { "type": "datetime" },
+        "power": { "type": "identity" }
+    }
+}
