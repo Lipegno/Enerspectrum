@@ -106,6 +106,10 @@
 				return;
 			}
 			
+			while (svg.lastChild) {
+				svg.removeChild(svg.lastChild);
+			}
+			
 			console.log(data);
 			data.forEach(function(d) {
 				d.timestamp = parseDate(d.timestamp);
