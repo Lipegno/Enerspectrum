@@ -36,7 +36,9 @@ sources.prepareSources();
 app.use('/api', sources.router);
 app.use('/auth', auth.router);
 
+
 var port = process.argv[2] || 3000;
+
 var server = app.listen(port, function() {
 	var host = server.address().address;
 	var port = server.address().port;

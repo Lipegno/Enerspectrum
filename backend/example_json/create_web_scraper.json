@@ -1,6 +1,6 @@
 {
     "name": "madeira-production",
-    "url": "http://eemnet.eem.pt/centroinfo/uma.aspx",
+    "url": "http://www.eem.pt/pages/uma/",
     "selector": "#GridView1 tr:nth-child(2) td",
     "converter": [
         { "name": "timestamp", "type": "datetime", "typeParams": { "format": "YYYY-MM-DD HH:mm:ss" } },
