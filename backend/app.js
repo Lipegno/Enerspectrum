@@ -34,6 +34,6 @@ process.on('SIGHUP', function() {
     serverCluster.reload();
 });
 
-console.log("Starting clusters...");
+console.log("Starting clusters (v2) ...");
 serverCluster.run();
-console.log("Clusters running.");
+console.log("Clusters running (v2) ...");
