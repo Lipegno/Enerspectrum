@@ -30,6 +30,7 @@ function webScraper(storage, config) {
 
 function create(storage, config, callback) {
 	try {
+		console.log("creating webscraper "+JSON.stringify(config,false,3));
 		var scraper = new webScraper(storage, config);
 	} catch (err) {
 		console.log("Error creating webscraper " + err);
