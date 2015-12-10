@@ -3,6 +3,9 @@
 
     function _query(tableName) {
         this.table = tableName;
+
+        console.log("querying "+tableName+" table");
+
         this.pipeline = [];
     }
     
@@ -60,6 +63,9 @@
     };
     
     _query.prototype.latest = function () {
+
+        console.log(JSON.stringify(this,false,4));
+
         return this.sort('-timestamp').limit(1);
     }
     
