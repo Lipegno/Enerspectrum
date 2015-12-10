@@ -21,6 +21,8 @@ function watchdog(interval, variance) {
 	this.interval = interval;
 	this.variance = variance;
 	
+	console.log("interval: "+this.interval+" , variance: "+this.variance);
+
 	this.check();
 }
 
