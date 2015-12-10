@@ -332,5 +332,5 @@ exports.unschedule = function(id) {
 	unschedule(id);
 };
 
-var fido = new watchdog(60, 30); // Wake up every 12 minutes, +/- 2 minutes
+var fido = new watchdog(600, 120); // Wake up every 12 minutes, +/- 2 minutes
 console.log("Taskqueue client %s listening", clientId);
