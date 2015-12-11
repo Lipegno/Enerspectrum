@@ -56,7 +56,16 @@
     </div>
     <div id="graphDiv"></div>
 
+    <input id="clickMe" type="button" value="send data" onclick="performSimpleRequest();" />
+
     <script>
+
+        function performSimpleRequest(){
+
+            vm.generateSample();
+            vm.sendSamples();
+        }
+
         function ViewModel() {
             this.samples = [];
             this.frequency = ko.observable(5);
