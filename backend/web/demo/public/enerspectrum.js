@@ -60,9 +60,6 @@
     };
     
     _query.prototype.latest = function () {
-
-        console.log(JSON.stringify(this,false,4));
-
         return this.sort('-timestamp').limit(1);
     }
     
@@ -119,7 +116,7 @@
         };
 
         if (method == 'POST') {
-            alert(payload);
+            alert(JSON.stringify(request));
             request.send(payload);
         } else {
             request.send();
