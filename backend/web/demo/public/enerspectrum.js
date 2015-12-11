@@ -116,7 +116,6 @@
         };
 
         if (method == 'POST') {
-            alert(JSON.stringify(request));
             request.send(payload);
         } else {
             request.send();
