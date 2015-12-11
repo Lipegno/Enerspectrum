@@ -3,9 +3,6 @@
 
     function _query(tableName) {
         this.table = tableName;
-
-        console.log("querying "+tableName+" table");
-
         this.pipeline = [];
     }
     
@@ -122,6 +119,7 @@
         };
 
         if (method == 'POST') {
+            alert(payload);
             request.send(payload);
         } else {
             request.send();
